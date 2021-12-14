@@ -5,7 +5,8 @@ import pandas as pd
 from bravado.client import SwaggerClient
 
 # This is the initialization of many of the data sources that we will need
-cbioportal = cbioportal = SwaggerClient.from_url('https://www.cbioportal.org/api/api-docs', config={"validate_requests":False,"validate_responses":False,"validate_swagger_spec": False,})
+cbioportal = cbioportal = SwaggerClient.from_url('https://www.cbioportal.org/api/api-docs', 
+    config={"validate_requests":False,"validate_responses":False,"validate_swagger_spec": False,})
 studies = cbioportal.Studies.getAllStudiesUsingGET().result()
 cancer_types = cbioportal.Cancer_Types.getAllCancerTypesUsingGET().result()
 
@@ -16,7 +17,7 @@ This app highlights some mutations in various cancer types.
 * The app is powered by the [Cancer Genomics Portal](https://www.cbioportal.org/)
 * These mutations are collected by a collection of very talented researchers.
 """)
-
+st.sidebar.header('Cancer Filters/Types')
 
 def studies_response_to_dict(studies):
     studies_dict = []
@@ -51,8 +52,12 @@ def studies_response_to_dict(studies):
     return studies_dict
 
 studies_dict = studies_response_to_dict(studies)
+studies_df = pd.DataFrame(studies_dict)
+
+selected_cancer_type = st.sidebar.selectbox('Cancer Type ID', studies_df['cancerTypeId'].unique())
+
+df_selected_cancer_studies = studies_df[studies_df['cancerTypeId'] == selected_cancer_type]
 
 st.write('Studes overview:')
-df = pd.DataFrame(studies_dict)
 
-df
+st.dataframe(df_selected_cancer_studies)
