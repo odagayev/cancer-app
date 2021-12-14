@@ -7,9 +7,13 @@ from bravado.client import SwaggerClient
 # This is the initialization of many of the data sources that we will need
 cbioportal = cbioportal = SwaggerClient.from_url('https://www.cbioportal.org/api/api-docs', 
     config={"validate_requests":False,"validate_responses":False,"validate_swagger_spec": False,})
+#Fetch all of the studies
 studies = cbioportal.Studies.getAllStudiesUsingGET().result()
-cancer_types = cbioportal.Cancer_Types.getAllCancerTypesUsingGET().result()
 
+#Limit the cancer types to only those that have studies
+study_cancer_types = [cancer_ids.cancerTypeId for cancer_ids in studies]
+cancer_types = cbioportal.Cancer_Types.getAllCancerTypesUsingGET().result()
+cancer_types_filtered = [cancer_object for cancer_object in cancer_types if cancer_object.cancerTypeId in study_cancer_types]
 
 st.title('Cancer Genomics Portal')
 st.markdown("""
@@ -54,10 +58,13 @@ def studies_response_to_dict(studies):
 studies_dict = studies_response_to_dict(studies)
 studies_df = pd.DataFrame(studies_dict)
 
-selected_cancer_type = st.sidebar.selectbox('Cancer Type ID', studies_df['cancerTypeId'].unique())
+#Built the sidebar
+cancer_type_names = {cancer_type.name for cancer_type in cancer_types_filtered}
+selected_cancer_type_two = st.sidebar.selectbox('Cancer Type Name', cancer_type_names)
 
-df_selected_cancer_studies = studies_df[studies_df['cancerTypeId'] == selected_cancer_type]
-
+#selection logic for the creation of the dataframe
+st.write(selected_cancer_type_two)
+cancer_object = [c for c in cancer_types if c.name == selected_cancer_type_two][0]
+df_selected_cancer_studies = studies_df[studies_df['cancerTypeId'] == cancer_object.cancerTypeId]
 st.write('Studes overview:')
-
 st.dataframe(df_selected_cancer_studies)
