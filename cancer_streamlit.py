@@ -56,6 +56,64 @@ def studies_response_to_dict(studies):
         studies_dict.append(study_dict)
     return studies_dict
 
+def get_mutations_for_study(study_id):
+    mutations_profileID = study_id + '_mutations'
+    sampleListId = study_id + '_all'
+    mutations = cbioportal.Mutations.getMutationsInMolecularProfileBySampleListIdUsingGET(
+        molecularProfileId=mutations_profileID,
+        sampleListId=sampleListId,
+        projection='DETAILED'
+    ).result()
+    return mutations
+
+def mutatations_response_to_dict(mutations):
+    mutation_dicts = []
+    for mutation in mutations:
+        mutation_dict = {}
+        mutation_dict['alleleSpecificCopyNumber'] = mutation.alleleSpecificCopyNumber
+        mutation_dict['aminoAcidChange'] = mutation.aminoAcidChange
+        mutation_dict['center'] = mutation.center
+        mutation_dict['chr'] = mutation.chr
+        mutation_dict['driverFilter'] = mutation.driverFilter
+        mutation_dict['driverFilterAnnotation'] = mutation.driverFilterAnnotation
+        mutation_dict['driverTiersFilter'] = mutation.driverTiersFilter
+        mutation_dict['driverTiersFilterAnnotation'] = mutation.driverTiersFilterAnnotation
+        mutation_dict['endPosition'] = mutation.endPosition
+        mutation_dict['entrezGeneId'] = mutation.entrezGeneId
+        mutation_dict['fisValue'] = mutation.fisValue
+        mutation_dict['functionalImpactScore'] = mutation.functionalImpactScore
+        #mutation_dict['gene'] = mutation.gene
+        mutation_dict['keyword'] = mutation.keyword
+        mutation_dict['linkMsa'] = mutation.linkMsa
+        mutation_dict['linkPdb'] = mutation.linkPdb
+        mutation_dict['linkXvar'] = mutation.linkXvar
+        mutation_dict['molecularProfileId'] = mutation.molecularProfileId
+        mutation_dict['mutationStatus'] = mutation.mutationStatus
+        mutation_dict['mutationType'] = mutation.mutationType
+        mutation_dict['namespaceColumns'] = mutation.namespaceColumns
+        mutation_dict['ncbiBuild'] = mutation.ncbiBuild
+        mutation_dict['normalAltCount'] = mutation.normalAltCount
+        mutation_dict['normalRefCount'] = mutation.normalRefCount
+        mutation_dict['patientId'] = mutation.patientId
+        mutation_dict['proteinChange'] = mutation.proteinChange
+        mutation_dict['proteinPosEnd'] = mutation.proteinPosEnd
+        mutation_dict['proteinPosStart'] = mutation.proteinPosStart
+        mutation_dict['referenceAllele'] = mutation.referenceAllele
+        mutation_dict['refseqMrnaId'] = mutation.refseqMrnaId
+        mutation_dict['sampleId'] = mutation.sampleId
+        mutation_dict['startPosition'] = mutation.startPosition
+        mutation_dict['studyId'] = mutation.studyId
+        mutation_dict['tumorAltCount'] = mutation.tumorAltCount
+        mutation_dict['tumorRefCount'] = mutation.tumorRefCount
+        mutation_dict['uniquePatientKey'] = mutation.uniquePatientKey
+        mutation_dict['uniqueSampleKey'] = mutation.uniqueSampleKey
+        mutation_dict['validationStatus'] = mutation.validationStatus
+        mutation_dict['variantAllele'] = mutation.variantAllele
+        mutation_dict['variantType'] = mutation.variantType
+        mutation_dicts.append(mutation_dict)
+    return mutation_dicts
+
+
 studies_dict = studies_response_to_dict(studies)
 studies_df = pd.DataFrame(studies_dict)
 
@@ -73,16 +131,10 @@ st.dataframe(df_selected_cancer_studies)
 
 #print(df_selected_cancer_studies.head(1))
 
-def get_mutations_for_study(study_id):
-    mutations_profileID = study_id + '_mutations'
-    sampleListId = study_id + '_all'
-    mutations = cbioportal.Mutations.getMutationsInMolecularProfileBySampleListIdUsingGET(
-        molecularProfileId=mutations_profileID,
-        sampleListId=sampleListId,
-        projection='DETAILED'
-    ).result()
-    return mutations
-
 study_mutations = get_mutations_for_study(df_selected_cancer_studies.studyId.iloc[0])
 
-print(study_mutations)
+study_mutations = mutatations_response_to_dict(study_mutations)
+
+df = pd.DataFrame(study_mutations)
+
+st.dataframe(df)
