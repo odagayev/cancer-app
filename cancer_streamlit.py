@@ -3,6 +3,7 @@ import pandas as pd
 import numpy as np
 import pandas as pd 
 from bravado.client import SwaggerClient
+from pprint import pprint
 
 # This is the initialization of many of the data sources that we will need
 cbioportal = cbioportal = SwaggerClient.from_url('https://www.cbioportal.org/api/api-docs', 
@@ -66,5 +67,22 @@ selected_cancer_type_two = st.sidebar.selectbox('Cancer Type Name', cancer_type_
 st.write(selected_cancer_type_two)
 cancer_object = [c for c in cancer_types if c.name == selected_cancer_type_two][0]
 df_selected_cancer_studies = studies_df[studies_df['cancerTypeId'] == cancer_object.cancerTypeId]
+
 st.write('Studes overview:')
 st.dataframe(df_selected_cancer_studies)
+
+#print(df_selected_cancer_studies.head(1))
+
+def get_mutations_for_study(study_id):
+    mutations_profileID = study_id + '_mutations'
+    sampleListId = study_id + '_all'
+    mutations = cbioportal.Mutations.getMutationsInMolecularProfileBySampleListIdUsingGET(
+        molecularProfileId=mutations_profileID,
+        sampleListId=sampleListId,
+        projection='DETAILED'
+    ).result()
+    return mutations
+
+study_mutations = get_mutations_for_study(df_selected_cancer_studies.studyId.iloc[0])
+
+print(study_mutations)
