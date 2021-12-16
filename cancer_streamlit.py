@@ -66,6 +66,13 @@ def get_mutations_for_study(study_id):
     ).result()
     return mutations
 
+def get_mutations_from_study_list(study_list):
+    mutations_list = []
+    for study in study_list:
+        mutations = get_mutations_for_study(study)
+        mutations_list.append(mutations)
+    return mutations_list
+
 def mutatations_response_to_dict(mutations):
     mutation_dicts = []
     for mutation in mutations:
@@ -82,7 +89,8 @@ def mutatations_response_to_dict(mutations):
         mutation_dict['entrezGeneId'] = mutation.entrezGeneId
         mutation_dict['fisValue'] = mutation.fisValue
         mutation_dict['functionalImpactScore'] = mutation.functionalImpactScore
-        #mutation_dict['gene'] = mutation.gene
+        mutation_dict['gene_obj'] = mutation.gene
+        mutation_dict['gene_str'] = str(mutation.gene) #this is a string version for the dataframe
         mutation_dict['keyword'] = mutation.keyword
         mutation_dict['linkMsa'] = mutation.linkMsa
         mutation_dict['linkPdb'] = mutation.linkPdb
@@ -125,6 +133,8 @@ selected_cancer_type_two = st.sidebar.selectbox('Cancer Type Name', cancer_type_
 st.write(selected_cancer_type_two)
 cancer_object = [c for c in cancer_types if c.name == selected_cancer_type_two][0]
 df_selected_cancer_studies = studies_df[studies_df['cancerTypeId'] == cancer_object.cancerTypeId]
+mutations_from_studies_list = df_selected_cancer_studies['studyId'].to_list()
+#print(mutations_from_studies_list)
 
 st.write('Studes overview:')
 st.dataframe(df_selected_cancer_studies)
@@ -132,9 +142,13 @@ st.dataframe(df_selected_cancer_studies)
 #print(df_selected_cancer_studies.head(1))
 
 study_mutations = get_mutations_for_study(df_selected_cancer_studies.studyId.iloc[0])
+mutations_study_list = get_mutations_from_study_list(mutations_from_studies_list)
+print(mutations_study_list)
 
 study_mutations = mutatations_response_to_dict(study_mutations)
 
-df = pd.DataFrame(study_mutations)
+study_mutations_df = pd.DataFrame(study_mutations)
+study_mutations_df = study_mutations_df.drop(columns=['gene_obj']) # have to drop this because object is not JSON serializable
 
-st.dataframe(df)
+st.write('Mutations present:')
+st.dataframe(study_mutations_df)
