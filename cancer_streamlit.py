@@ -144,6 +144,11 @@ st.dataframe(df_selected_cancer_studies)
 #print(df_selected_cancer_studies.head(1))
 
 study_mutations = get_mutations_for_study(df_selected_cancer_studies.studyId.iloc[0])
+
+#study mutation name extraction
+study_mutation_names = {mutation.sampleId for mutation in study_mutations}
+mutation_selector = st.sidebar.multiselect('Mutation Types', study_mutation_names, study_mutation_names)
+
 mutations_study_list = get_mutations_from_study_list(mutations_from_studies_list)
 study_mutations = mutatations_response_to_dict(study_mutations)
 
