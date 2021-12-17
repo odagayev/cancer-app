@@ -128,9 +128,11 @@ studies_df = pd.DataFrame(studies_dict)
 #Built the sidebar
 cancer_type_names = {cancer_type.name for cancer_type in cancer_types_filtered}
 selected_cancer_type_two = st.sidebar.selectbox('Cancer Type Name', cancer_type_names)
+st.write(selected_cancer_type_two)
+
 
 #selection logic for the creation of the dataframe
-st.write(selected_cancer_type_two)
+
 cancer_object = [c for c in cancer_types if c.name == selected_cancer_type_two][0]
 df_selected_cancer_studies = studies_df[studies_df['cancerTypeId'] == cancer_object.cancerTypeId]
 mutations_from_studies_list = df_selected_cancer_studies['studyId'].to_list()
@@ -143,8 +145,6 @@ st.dataframe(df_selected_cancer_studies)
 
 study_mutations = get_mutations_for_study(df_selected_cancer_studies.studyId.iloc[0])
 mutations_study_list = get_mutations_from_study_list(mutations_from_studies_list)
-print(mutations_study_list)
-
 study_mutations = mutatations_response_to_dict(study_mutations)
 
 study_mutations_df = pd.DataFrame(study_mutations)
