@@ -130,21 +130,17 @@ cancer_type_names = {cancer_type.name for cancer_type in cancer_types_filtered}
 selected_cancer_type_two = st.sidebar.selectbox('Cancer Type Name', cancer_type_names)
 st.write(selected_cancer_type_two)
 
-
 #selection logic for the creation of the dataframe
-
 cancer_object = [c for c in cancer_types if c.name == selected_cancer_type_two][0]
 df_selected_cancer_studies = studies_df[studies_df['cancerTypeId'] == cancer_object.cancerTypeId]
 mutations_from_studies_list = df_selected_cancer_studies['studyId'].to_list()
-#print(mutations_from_studies_list)
 
 st.write('Studes overview:')
 st.dataframe(df_selected_cancer_studies)
 
-#print(df_selected_cancer_studies.head(1))
-
 study_mutations = get_mutations_for_study(df_selected_cancer_studies.studyId.iloc[0])
-print(study_mutations[1].gene.hugoGeneSymbol)
+#print(study_mutations[1].gene.hugoGeneSymbol)
+
 #study mutation name extraction
 study_gene_names = {mutation.gene.hugoGeneSymbol for mutation in study_mutations}
 mutation_selector = st.sidebar.multiselect('Surveyed Gene', study_gene_names, study_gene_names)
