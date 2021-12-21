@@ -145,6 +145,8 @@ study_mutations = get_mutations_for_study(df_selected_cancer_studies.studyId.ilo
 study_gene_names = {mutation.gene.hugoGeneSymbol for mutation in study_mutations}
 mutation_selector = st.sidebar.multiselect('Surveyed Gene', study_gene_names, study_gene_names)
 
+mutation_enterer = st.sidebar.text_area('Enter Gene Name')
+
 mutations_study_list = get_mutations_from_study_list(mutations_from_studies_list)
 study_mutations = mutatations_response_to_dict(study_mutations)
 
