@@ -143,6 +143,28 @@ study_mutations = get_mutations_for_study(df_selected_cancer_studies.studyId.ilo
 
 #study mutation name extraction
 study_gene_names = {mutation.gene.hugoGeneSymbol for mutation in study_mutations}
+dict_count = {}
+for gene in study_mutations:
+    if gene.gene.hugoGeneSymbol in dict_count:
+        dict_count[gene.gene.hugoGeneSymbol] += 1
+    else:
+        dict_count[gene.gene.hugoGeneSymbol] = 1
+#print(dict_count)
+
+def return_top_gene_names(study_mutations):
+    gene_names = {mutation.gene.hugoGeneSymbol for mutation in study_mutations}
+    dict_count = {}
+    for gene in study_mutations:
+        if gene.gene.hugoGeneSymbol in dict_count:
+            dict_count[gene.gene.hugoGeneSymbol] += 1
+        else:
+            dict_count[gene.gene.hugoGeneSymbol] = 1
+    top_gene_names = sorted(dict_count, key=dict_count.get, reverse=True)[:10]
+    return top_gene_names
+
+x = return_top_gene_names(study_mutations)
+print(x)
+
 mutation_selector = st.sidebar.multiselect('Surveyed Gene', study_gene_names, study_gene_names)
 
 mutation_enterer = st.sidebar.text_area('Enter Gene Name')
