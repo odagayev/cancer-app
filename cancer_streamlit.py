@@ -156,3 +156,4 @@ study_mutations_df = study_mutations_df.drop(columns=['gene_obj']) # have to dro
 st.write('Mutations present:')
 st.button('Show mutations')
 st.dataframe(study_mutations_df)
+st.download_button('Download file', study_mutations_df.to_csv(index=False))
