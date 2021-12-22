@@ -121,6 +121,16 @@ def mutatations_response_to_dict(mutations):
         mutation_dicts.append(mutation_dict)
     return mutation_dicts
 
+def return_top_gene_names(study_mutations):
+    gene_names = {mutation.gene.hugoGeneSymbol for mutation in study_mutations}
+    dict_count = {}
+    for gene in study_mutations:
+        if gene.gene.hugoGeneSymbol in dict_count:
+            dict_count[gene.gene.hugoGeneSymbol] += 1
+        else:
+            dict_count[gene.gene.hugoGeneSymbol] = 1
+    top_gene_names = sorted(dict_count, key=dict_count.get, reverse=True)[:10]
+    return top_gene_names
 
 studies_dict = studies_response_to_dict(studies)
 studies_df = pd.DataFrame(studies_dict)
@@ -143,37 +153,22 @@ study_mutations = get_mutations_for_study(df_selected_cancer_studies.studyId.ilo
 
 #study mutation name extraction
 study_gene_names = {mutation.gene.hugoGeneSymbol for mutation in study_mutations}
-dict_count = {}
-for gene in study_mutations:
-    if gene.gene.hugoGeneSymbol in dict_count:
-        dict_count[gene.gene.hugoGeneSymbol] += 1
-    else:
-        dict_count[gene.gene.hugoGeneSymbol] = 1
-#print(dict_count)
 
-def return_top_gene_names(study_mutations):
-    gene_names = {mutation.gene.hugoGeneSymbol for mutation in study_mutations}
-    dict_count = {}
-    for gene in study_mutations:
-        if gene.gene.hugoGeneSymbol in dict_count:
-            dict_count[gene.gene.hugoGeneSymbol] += 1
-        else:
-            dict_count[gene.gene.hugoGeneSymbol] = 1
-    top_gene_names = sorted(dict_count, key=dict_count.get, reverse=True)[:10]
-    return top_gene_names
-
-x = return_top_gene_names(study_mutations)
-print(x)
 
 mutation_selector = st.sidebar.multiselect('Surveyed Gene', study_gene_names, study_gene_names)
 
 mutation_enterer = st.sidebar.text_area('Enter Gene Name')
 
 mutations_study_list = get_mutations_from_study_list(mutations_from_studies_list)
-study_mutations = mutatations_response_to_dict(study_mutations)
+study_mutations_dict = mutatations_response_to_dict(study_mutations)
 
-study_mutations_df = pd.DataFrame(study_mutations)
+study_mutations_df = pd.DataFrame(study_mutations_dict)
 study_mutations_df = study_mutations_df.drop(columns=['gene_obj']) # have to drop this because object is not JSON serializable
+
+top_mutations = return_top_gene_names(study_mutations)
+print(top_mutations)
+st.write(pd.DataFrame(top_mutations))
+print(top_mutations)
 
 st.write('Mutations present:')
 st.button('Show mutations')
