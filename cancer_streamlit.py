@@ -166,9 +166,6 @@ study_mutations_df = pd.DataFrame(study_mutations_dict)
 study_mutations_df = study_mutations_df.drop(columns=['gene_obj']) # have to drop this because object is not JSON serializable
 
 top_mutations = return_top_gene_names(study_mutations)
-print(top_mutations)
-st.write(pd.DataFrame(top_mutations))
-print(top_mutations)
 
 st.write('Mutations present:')
 st.button('Show mutations')
