@@ -132,6 +132,13 @@ def return_top_gene_names(study_mutations):
     top_gene_names = sorted(dict_count, key=dict_count.get, reverse=True)[:10]
     return top_gene_names
 
+def return_top_mutations_from_study_mutations_dict(study_mutations_dict):
+    top_mutations_list = []
+    for mutation in study_mutations_dict:
+        if mutation['gene_obj'].hugoGeneSymbol in mutation_selector:
+            top_mutations_list.append(mutation)
+    return top_mutations_list
+
 studies_dict = studies_response_to_dict(studies)
 studies_df = pd.DataFrame(studies_dict)
 
@@ -155,17 +162,18 @@ study_mutations = get_mutations_for_study(df_selected_cancer_studies.studyId.ilo
 study_gene_names = {mutation.gene.hugoGeneSymbol for mutation in study_mutations}
 
 
-mutation_selector = st.sidebar.multiselect('Surveyed Gene', study_gene_names, study_gene_names)
-
-mutation_enterer = st.sidebar.text_area('Enter Gene Name')
 
 mutations_study_list = get_mutations_from_study_list(mutations_from_studies_list)
 study_mutations_dict = mutatations_response_to_dict(study_mutations)
 
-study_mutations_df = pd.DataFrame(study_mutations_dict)
-study_mutations_df = study_mutations_df.drop(columns=['gene_obj']) # have to drop this because object is not JSON serializable
-
 top_mutations = return_top_gene_names(study_mutations)
+
+mutation_selector = st.sidebar.multiselect('Top Ten Mutated Genes', top_mutations, top_mutations)
+
+top_mutations_dict = return_top_mutations_from_study_mutations_dict(study_mutations_dict)
+
+study_mutations_df = pd.DataFrame(top_mutations_dict)
+study_mutations_df = study_mutations_df.drop(columns=['gene_obj']) # have to drop this because object is not JSON serializable
 
 st.write('Mutations present:')
 st.button('Show mutations')
