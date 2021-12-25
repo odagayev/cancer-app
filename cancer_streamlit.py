@@ -122,7 +122,6 @@ def mutatations_response_to_dict(mutations):
     return mutation_dicts
 
 def return_top_gene_names(study_mutations):
-    gene_names = {mutation.gene.hugoGeneSymbol for mutation in study_mutations}
     dict_count = {}
     for gene in study_mutations:
         if gene.gene.hugoGeneSymbol in dict_count:
@@ -156,14 +155,7 @@ st.write('Studes overview:')
 st.dataframe(df_selected_cancer_studies)
 
 study_mutations = get_mutations_for_study(df_selected_cancer_studies.studyId.iloc[0])
-#print(study_mutations[1].gene.hugoGeneSymbol)
 
-#study mutation name extraction
-study_gene_names = {mutation.gene.hugoGeneSymbol for mutation in study_mutations}
-
-
-
-mutations_study_list = get_mutations_from_study_list(mutations_from_studies_list)
 study_mutations_dict = mutatations_response_to_dict(study_mutations)
 
 top_mutations = return_top_gene_names(study_mutations)
