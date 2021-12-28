@@ -12,9 +12,7 @@ cbioportal = cbioportal = SwaggerClient.from_url('https://www.cbioportal.org/api
 studies = cbioportal.Studies.getAllStudiesUsingGET().result()
 
 #Limit the cancer types to only those that have studies
-study_cancer_types = [cancer_ids.cancerTypeId for cancer_ids in studies]
-cancer_types = cbioportal.Cancer_Types.getAllCancerTypesUsingGET().result()
-cancer_types_filtered = [cancer_object for cancer_object in cancer_types if cancer_object.cancerTypeId in study_cancer_types]
+
 
 st.title('Cancer Genomics Portal')
 st.markdown("""
@@ -138,6 +136,10 @@ def return_top_mutations_from_study_mutations_dict(study_mutations_dict):
             top_mutations_list.append(mutation)
     return top_mutations_list
 
+study_cancer_types = [cancer_ids.cancerTypeId for cancer_ids in studies]
+cancer_types = cbioportal.Cancer_Types.getAllCancerTypesUsingGET().result()
+cancer_types_filtered = [cancer_object for cancer_object in cancer_types if cancer_object.cancerTypeId in study_cancer_types]
+
 studies_dict = studies_response_to_dict(studies)
 studies_df = pd.DataFrame(studies_dict)
 
@@ -145,6 +147,8 @@ studies_df = pd.DataFrame(studies_dict)
 cancer_type_names = {cancer_type.name for cancer_type in cancer_types_filtered}
 selected_cancer_type_two = st.sidebar.selectbox('Cancer Type Name', cancer_type_names)
 st.write(selected_cancer_type_two)
+
+st.write(cancer_types_filtered)
 
 #selection logic for the creation of the dataframe
 cancer_object = [c for c in cancer_types if c.name == selected_cancer_type_two][0]
